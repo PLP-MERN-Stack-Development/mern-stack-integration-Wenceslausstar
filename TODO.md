@@ -59,4 +59,4 @@
 - [x] Proper integration between MongoDB, Express.js, React.js, and Node.js
 - [x] Clean code organization with separation of concerns
 - [x] Responsive UI with good user experience
-- [x] Implementation of at least one advanced feature
+- [x]

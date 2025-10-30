@@ -13,7 +13,7 @@ const categoryRoutes = require("./routes/categories");
 const authRoutes = require("./routes/auth");
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, "..", ".env") });
 
 // Initialize Express app
 const app = express();
