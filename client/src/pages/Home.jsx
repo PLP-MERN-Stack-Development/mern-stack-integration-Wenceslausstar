@@ -1,153 +1,56 @@
-// Home.jsx - Home page component
-
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useApp } from "../context/app";
-import useApi from "../hooks/useApi";
-import { postService, categoryService } from "../services/api";
-import "./Home.css";
+import React from 'react'
+import Navbar from '../Components/Navbar'
+import axios from 'axios'
+import { useEffect } from 'react'
 
 const Home = () => {
-  const { posts, categories, fetchPosts, fetchCategories } = useApp();
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // Fetch categories on mount
-  useEffect(() => {
-    if (categories.length === 0) {
-      fetchCategories();
-    }
-  }, [categories.length, fetchCategories]);
-
-  // Fetch posts when filters change
-  useEffect(() => {
-    fetchPosts({
-      page: currentPage,
-      limit: 10,
-      category: selectedCategory,
-      search: searchTerm,
-    });
-  }, [currentPage, selectedCategory, searchTerm, fetchPosts]);
-
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
-    setCurrentPage(1);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setCurrentPage(1);
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  return (
-    <div className="home">
-      <div className="home-header">
-        <h1>Welcome to MERN Blog</h1>
-        <p>Discover amazing stories and insights</p>
-      </div>
-
-      <div className="filters">
-        <form onSubmit={handleSearch} className="search-form">
-          <input
-            type="text"
-            placeholder="Search posts..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-          <button type="submit" className="search-button">
-            Search
-          </button>
-        </form>
-
-        <div className="category-filter">
-          <select
-            value={selectedCategory}
-            onChange={(e) => handleCategoryChange(e.target.value)}
-            className="category-select"
-          >
-            <option value="">All Categories</option>
-            {categories.map((category) => (
-              <option key={category._id} value={category._id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="posts-grid">
-        {posts.length === 0 ? (
-          <div className="no-posts">
-            <p>No posts found.</p>
-          </div>
-        ) : (
-          posts.map((post) => (
-            <div key={post._id} className="post-card">
-              {post.featuredImage && (
-                <img
-                  src={`http://localhost:5000/${post.featuredImage}`}
-                  alt={post.title}
-                  className="post-image"
-                />
-              )}
-              <div className="post-content">
-                <h2 className="post-title">
-                  <Link to={`/posts/${post._id}`}>{post.title}</Link>
-                </h2>
-                <p className="post-excerpt">{post.excerpt}</p>
-                <div className="post-meta">
-                  <span className="post-author">By {post.author.username}</span>
-                  <span className="post-date">
-                    {formatDate(post.createdAt)}
-                  </span>
-                  <span
-                    className="post-category"
-                    style={{ backgroundColor: post.category.color }}
-                  >
-                    {post.category.name}
-                  </span>
+    const token = localStorage.getItem("token");
+    useEffect(() => {
+        if (token) {
+            axios.get("http://localhost:3000/api/auth/profile", {
+                withCredentials: true
+            }).then((response) => {
+                return window.location.href = '/dashboard';
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+    }, [token]);
+    return (
+        <>
+            <Navbar navBg={'tw-bg-amber-400'} isLogin={false} />
+            <div className='tw-border-b-[1px] tw-border-b-black'></div>
+            <section className='tw-bg-amber-400'>
+                <div className="container tw-py-32">
+                    <h1 className='tw-text-[3.5rem] sm:tw-text-[6.5rem] tw-font-semibold'>Stay curious.</h1>
+                    <p className='mt-4 tw-font-sans tw-tracking-tighter tw-font-medium tw-text-xl sm:tw-text-2xl'>Discover stories, thinking, and expertise from writers on any topic.</p>
+                    <button className='btn btn-dark tw-rounded-full tw-px-12 tw-py-2 mt-4 tw-text-xl tw-font-sans tw-tracking-tighter'>Start Reading</button>
                 </div>
-                <div className="post-stats">
-                  <span>{post.viewCount} views</span>
-                  <span>{post.comments.length} comments</span>
+            </section>
+            <div className='tw-border-b-[1px] tw-border-b-black'></div>
+
+            <div className="container tw-my-6">
+                <div className="tw-flex">
+                    <div className="tw-flex tw-flex-col">
+                    </div>
+                    <div className="tw-flex tw-flex-col">
+                        <div className="tw-flex tw-gap-2 tw-flex-wrap tw-px-4">
+                            <button className="btn btn-outline-dark">Programming</button>
+                            <button className="btn btn-outline-dark">Social</button>
+                            <button className="btn btn-outline-dark">Politics</button>
+                            <button className="btn btn-outline-dark">Technology</button>
+                            <button className="btn btn-outline-dark">Music</button>
+                            <button className="btn btn-outline-dark">Engineering</button>
+                            <button className="btn btn-outline-dark">Mythology</button>
+                            <button className="btn btn-outline-dark">Psycology</button>
+                            <button className="btn btn-outline-dark">Human</button>
+                            <button className="btn btn-outline-dark">Ethical</button>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          ))
-        )}
-      </div>
+        </>
+    )
+}
 
-      {posts.length > 0 && (
-        <div className="pagination">
-          <button
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="pagination-button"
-          >
-            Previous
-          </button>
-          <span className="pagination-info">Page {currentPage}</span>
-          <button
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={posts.length < 10}
-            className="pagination-button"
-          >
-            Next
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Home;
+export default Home
